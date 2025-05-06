@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: mavenwebpod
+ namespace: beta
+spec: 
+  replicas: 2
+  strategy:
+   type: Recreate
+  selector:
+   matchLabels:
+    app: mavenwebapp
+  template:
+   metadata:
+    labels:
+      app: mavenwebapp
+   spec:
+     containers:
+     - name: mavenwebcontainer
+       image: bharathreddymbr/maven-web-application:1
+       ports:
+       - containerPort: 8080
+       resources:
+         requests:
+           cpu: 250m
+           memory: 250Mi
+         limits:
+           cpu: 300m
+           memory: 300Mi
+       livenessProbe:
+         httpGet:
+           path: /maven-web-application/
+           port: 8080
+         initialDelaySeconds: 60
+         periodSeconds: 40
+         timeoutSeconds: 4
+       readinessProbe:
+         httpGet:
+          path: /maven-web-application/
+          port: 8080
+         initialDelaySeconds: 60
+         periodSeconds: 40
+         timeoutSeconds: 4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mavenwebsvc
+  namespace: beta
+spec:
+ type: LoadBalancer
+ selector:
+   app: mavenwebapp
+ ports:
+ - port: 80
+   targetPort: 8080 
