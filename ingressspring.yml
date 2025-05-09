@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: springappingress
+  namespace: beta
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: springapp.co.in
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: springappsvc
+                port:
+                  number: 80
+          - path: "/mongodb"
+            pathType: Prefix
+            backend:
+              service:
+                name: springappsvc
+                port:
+                  number: 80
+

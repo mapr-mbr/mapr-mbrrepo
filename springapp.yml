@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springappdep
+  namespace: beta
+spec:
+ replicas: 2
+ selector:
+  matchLabels:
+   app: springapp
+ strategy:
+  type: RollingUpdate
+  rollingUpdate:
+   maxSurge: 1
+   maxUnavailable: 1
+ minReadySeconds: 30
+ template:
+  metadata:
+   labels:
+    app: springapp
+  spec:
+    containers:
+    - name: springappcontainer
+      image: bharathreddymbr/spring-boot-app:1
+      ports:
+      - containerPort: 8080
+      env:
+      - name: MONGO_DB_HOSTNAME
+        value: mongosvc
+      - name: MONGO_DB_USERNAME
+        valueFrom: 
+         configMapKeyRef:
+          name: springappconfig
+          key: MONGO_DB_USERNAME
+      - name: MONGO_DB_PASSWORD
+        valueFrom:
+         secretKeyRef:
+          name: springappsecret
+          key: MONGO_DB_PASSWORD
+      resources:
+       requests:
+        cpu: 250m
+        memory: 250Mi
+       limits:
+        cpu: 300m
+        memory: 300Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springappsvc
+  namespace: beta
+spec:
+ type: LoadBalancer
+ selector:
+  app: springapp
+ ports:
+ - port: 80
+   targetPort: 8080
+

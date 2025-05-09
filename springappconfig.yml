@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: springappconfig
+  namespace: beta
+data:
+  MONGO_DB_USERNAME: devdb
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: springappsecret
+  namespace: beta
+type: opaque
+data:
+  MONGO_DB_PASSWORD: bWJy
+ 

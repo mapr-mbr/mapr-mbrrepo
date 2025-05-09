@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb
+  namespace: beta
+spec:
+ replicas: 1
+ selector:
+  matchLabels:
+   app: mongodb
+ template:
+  metadata:
+   labels:
+     app: mongodb
+  spec:
+   volumes:
+   - name: mongodbvol
+     persistentVolumeClaim:
+      claimName: mongopvcc
+   containers:
+   - name: mongodbcontainer
+     image: mongo
+     ports:
+     - containerPort: 27017
+     volumeMounts:
+     - name: mongodbvol
+       mountPath: /data/db
+     env:
+     - name: MONGO_INITDB_ROOT_USERNAME
+       valueFrom: 
+        configMapKeyRef:
+         name: mongoconfig
+         key: MONGO_INITDB_ROOT_USERNAME
+     - name: MONGO_INITDB_ROOT_PASSWORD
+       valueFrom:
+        secretKeyRef:
+         name: mongosecret
+         key: MONGO_INITDB_ROOT_PASSWORD
+     resources:
+      requests:
+         cpu: 250m
+         memory: 250Mi
+      limits:
+         cpu: 300m
+         memory: 300Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongosvc
+  namespace: beta 
+spec:
+ type: ClusterIP
+ selector:
+  app: mongodb
+ ports:
+ - port: 27017
+   targetPort: 27017

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongoconfig
+  namespace: beta
+data:
+ MONGO_INITDB_ROOT_USERNAME: devdb
